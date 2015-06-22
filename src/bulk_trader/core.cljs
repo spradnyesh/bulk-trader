@@ -4,13 +4,6 @@
 
               [bulk-trader.globals :as g]))
 
-(enable-console-print!)
-
-;; define your app data so that it doesn't get over-written on reload
-(defonce app-state (atom {:trader nil
-                          :logged-in? false
-                          :data nil}))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; helpers
 
@@ -69,7 +62,7 @@
        ;; TODO
        (reify om/IRender
          (render [_] (dom/p nil "TODO")))))
-   app-state
+   g/app-state
    {:target (. js/document (getElementById "main"))}))
 
 (defn on-js-reload []
