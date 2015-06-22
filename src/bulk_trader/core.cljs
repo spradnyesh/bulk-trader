@@ -1,6 +1,8 @@
 (ns ^:figwheel-always bulk-trader.core
     (:require[om.core :as om :include-macros true]
-             [om.dom :as dom :include-macros true]))
+             [om.dom :as dom :include-macros true]
+
+             [bulk-trader.globals :as g]))
 
 (enable-console-print!)
 
@@ -9,6 +11,56 @@
                           :logged-in? false
                           :data nil}))
 
-(defonce traders ["geojit"])
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; event-handlers
 
-(defn on-js-reload [])
+;; TODO
+(defn e-select-trader [e]
+  (.log js/console e)
+  nil)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; views
+
+(defn v-trader-view [trader owner]
+  (reify om/IRender
+    (render [this]
+      (dom/div "radio"
+               (dom/label "form-group"
+                          (dom/input #js {:type "radio" :name "optionRadios"
+                                          :value (:v trader)}
+                                     (:n trader)))))))
+
+(defn v-select-traders [traders owner]
+  (reify om/IRender
+    (render [this]
+      (dom/form #js {:action "#"}
+               (dom/h3 nil "Select Trader")
+               (apply dom/div "radio"
+                      (om/build-all v-trader-view traders))
+               (dom/div nil
+                        (dom/label nil
+                                   (dom/button #js {:className "btn btn-default"
+                                                    :type "submit"
+                                                    :onClick e-select-trader}
+                                               "Submit")))))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; init
+
+(defn init []
+  (om/root
+   (fn [data owner]
+     (if-not (:logged-in? data)
+       (reify om/IRender
+         (render [_] (om/build v-select-traders g/traders)))
+       ;; TODO
+       (reify om/IRender
+         (render [_] (dom/p nil "TODO")))))
+   app-state
+   {:target (. js/document (getElementById "main"))}))
+
+(defn on-js-reload []
+  (init))
+
+(init)
