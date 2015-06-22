@@ -1,8 +1,8 @@
 (ns ^:figwheel-always bulk-trader.core
-    (:require[om.core :as om :include-macros true]
-             [om.dom :as dom :include-macros true]
+    (:require [om.core :as om :include-macros true]
+              [om.dom :as dom :include-macros true]
 
-             [bulk-trader.globals :as g]))
+              [bulk-trader.globals :as g]))
 
 (enable-console-print!)
 
@@ -12,12 +12,24 @@
                           :data nil}))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; helpers
+
+;; find "index" (from g/traders) of selected trader
+(defn find-selected-trader [e]
+  (let [children (.-children (aget (.-children (.-form (.-target e))) 1))]
+    ;; this "loop" is needed coz children is HTMLElements which is *not* iterable
+    (loop [i (dec (.-length children))]
+      (if (= -1 i)
+        -1 ; none selected
+        (let [checked (.-checked (aget (.-children (aget (.-children (aget children i)) 0)) 0))]
+          (if checked i (recur (dec i))))))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; event-handlers
 
-;; TODO
 (defn e-select-trader [e]
-  (.log js/console e)
-  nil)
+  (.log js/console (find-selected-trader e))
+  (.preventDefault e)) ; return "false" is deprecated
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; views
