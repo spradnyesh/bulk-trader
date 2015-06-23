@@ -113,7 +113,7 @@
     (render [this]
       (dom/form #js {:action "#"}
                (dom/h3 nil "Select Trader")
-               (apply dom/div "radio"
+               (apply dom/div #js {:className "radio"}
                       (om/build-all trader-view traders))
                (dom/div nil
                         (dom/label nil
