@@ -27,16 +27,40 @@
                                           :value (:v trader)}
                                      (:n trader)))))))
 
+(defn data-view [data owner]
+  (reify om/IRender
+    (render [this]
+      (let [[exch segment smbl bs qty typ price slprice] data]
+        (dom/tr nil
+                (dom/td nil exch)
+                (dom/td nil segment)
+                (dom/td nil smbl)
+                (dom/td nil bs)
+                (dom/td nil qty)
+                (dom/td nil typ)
+                (dom/td nil price)
+                (dom/td nil slprice))))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; event-handlers and views
 
-(defn e-enter-data [e]
-  (.log js/console "inside e-enter-data")
+(defn e-trade [e]
+  (.log js/console "inside e-trade")
+
+  (.preventDefault e))
+
+(defn e-edit-data [e]
+  (.log js/console "inside e-edit-data")
 
   (.preventDefault e))
 
 (defn e-upload-data [e]
   (.log js/console "inside e-upload-data")
+
+  (.preventDefault e))
+
+(defn e-enter-data [e]
+  (.log js/console "inside e-enter-data")
 
   (.preventDefault e))
 
@@ -48,16 +72,29 @@
          (dom/div nil
                   (dom/h3 nil "Logged in to trader: "
                           (dom/mark nil (:trader data)))
-                  (dom/form #js {:action "#"}
-                            (dom/div nil
-                                     (dom/label nil
-                                                (dom/button #js {:className "btn btn-default"
-                                                                 :onClick e-enter-data}
-                                                            "Enter / Copy-Paste"))
-                                     (dom/label nil
-                                                (dom/button #js {:className "btn btn-default"
-                                                                 :onClick e-upload-data}
-                                                            "Upload"))))))))
+                  (if (nil? (:data data))
+                    (dom/div nil
+                             (dom/label nil
+                                        (dom/button #js {:className "btn btn-default"
+                                                         :onClick e-enter-data}
+                                                    "Enter / Copy-Paste"))
+                             (dom/label nil
+                                        (dom/button #js {:className "btn btn-default"
+                                                         :onClick e-upload-data}
+                                                    "Upload")))
+                    (dom/div nil
+                             (dom/div nil
+                                      (dom/label nil
+                                                 (dom/button #js {:className "btn btn-default"
+                                                                  :onClick e-edit-data}
+                                                             "Edit Trading Data"))
+                                      (dom/label nil
+                                                 (dom/button #js {:className "btn btn-default"
+                                                                  :onClick e-trade}
+                                                             "Execute Trades!!!")))
+                             (dom/h4 nil "Existing Trading Data:")
+                             (apply dom/table #js {:className "table table-striped table-bordered"}
+                                    (om/build-all data-view (:data data)))))))))
    g/app-state
    {:target (. js/document (getElementById "main"))}))
 
