@@ -2,7 +2,8 @@
     (:require [om.core :as om :include-macros true]
               [om.dom :as dom :include-macros true]
 
-              [bulk-trader.globals :as g]))
+              [bulk-trader.globals :as g]
+              [bulk-trader.geojit :as geojit]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; helpers
@@ -20,9 +21,18 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; event-handlers
 
-(defn e-select-trader [e]
-  (.log js/console (find-selected-trader e))
-  (.preventDefault e)) ; return "false" is deprecated
+(defn e-login [e]
+  (let [trader (find-selected-trader e)
+        ;; trader is index from g/traders
+        [logged-in? trader-name] (cond (= 0 trader) (geojit/login)
+                                       ;; (= 1 trader) (icici/login)
+                                       )]
+    (if logged-in?
+      (.log js/console "Congratulations! Logged in successfully, to trader: " trader-name)
+      (js/alert "Login failed! Please try again."))
+
+    ;; return "false" is deprecated
+    (.preventDefault e)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; views
@@ -36,7 +46,7 @@
                                           :value (:v trader)}
                                      (:n trader)))))))
 
-(defn v-select-traders [traders owner]
+(defn v-login [traders owner]
   (reify om/IRender
     (render [this]
       (dom/form #js {:action "#"}
@@ -47,7 +57,7 @@
                         (dom/label nil
                                    (dom/button #js {:className "btn btn-default"
                                                     :type "submit"
-                                                    :onClick e-select-trader}
+                                                    :onClick e-login}
                                                "Submit")))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -58,7 +68,7 @@
    (fn [data owner]
      (if-not (:logged-in? data)
        (reify om/IRender
-         (render [_] (om/build v-select-traders g/traders)))
+         (render [_] (om/build v-login g/traders)))
        ;; TODO
        (reify om/IRender
          (render [_] (dom/p nil "TODO")))))
