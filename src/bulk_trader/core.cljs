@@ -18,26 +18,7 @@
         (let [checked (.-checked (aget (.-children (aget (.-children (aget children i)) 0)) 0))]
           (if checked i (recur (dec i))))))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; event-handlers
-
-(defn e-login [e]
-  (let [trader (find-selected-trader e)
-        ;; trader is index from g/traders
-        [logged-in? trader-name] (cond (= 0 trader) (geojit/login)
-                                       ;; (= 1 trader) (icici/login)
-                                       )]
-    (if logged-in?
-      (.log js/console "Congratulations! Logged in successfully, to trader: " trader-name)
-      (js/alert "Login failed! Please try again."))
-
-    ;; return "false" is deprecated
-    (.preventDefault e)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; views
-
-(defn v-trader-view [trader owner]
+(defn trader-view [trader owner]
   (reify om/IRender
     (render [this]
       (dom/div "radio"
@@ -46,13 +27,30 @@
                                           :value (:v trader)}
                                      (:n trader)))))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; event-handlers and views
+
+(defn e-login [e]
+  (let [trader (find-selected-trader e)
+        ;; trader is index from g/traders
+        [logged-in? trader-name] (cond (= 0 trader) (geojit/login)
+                                       ;; (= 1 trader) (icici/login)
+                                       )]
+    (if logged-in?
+      (do (.log js/console "Congratulations! Logged in successfully, to trader: " trader-name)
+          )
+      (js/alert "Login failed! Please try again."))
+
+    ;; return "false" is deprecated
+    (.preventDefault e)))
+
 (defn v-login [traders owner]
   (reify om/IRender
     (render [this]
       (dom/form #js {:action "#"}
                (dom/h3 nil "Select Trader")
                (apply dom/div "radio"
-                      (om/build-all v-trader-view traders))
+                      (om/build-all trader-view traders))
                (dom/div nil
                         (dom/label nil
                                    (dom/button #js {:className "btn btn-default"
