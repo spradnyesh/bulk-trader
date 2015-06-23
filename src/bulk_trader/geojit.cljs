@@ -18,4 +18,4 @@
     (swap! g/app-state assoc
            :trader trader
            :logged-in logged-in?)
-    [logged-in? trader]))
+    logged-in?))

@@ -30,18 +30,45 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; event-handlers and views
 
+(defn e-enter-data [e]
+  (.log js/console "inside e-enter-data")
+
+  (.preventDefault e))
+
+(defn e-upload-data [e]
+  (.log js/console "inside e-upload-data")
+
+  (.preventDefault e))
+
+(defn v-data-init []
+  (om/root
+   (fn [data owner]
+     (reify om/IRender
+       (render [_]
+         (dom/div nil
+                  (dom/h3 nil "Logged in to trader: "
+                          (dom/mark nil (:trader data)))
+                  (dom/form #js {:action "#"}
+                            (dom/div nil
+                                     (dom/label nil
+                                                (dom/button #js {:className "btn btn-default"
+                                                                 :onClick e-enter-data}
+                                                            "Enter / Copy-Paste"))
+                                     (dom/label nil
+                                                (dom/button #js {:className "btn btn-default"
+                                                                 :onClick e-upload-data}
+                                                            "Upload"))))))))
+   g/app-state
+   {:target (. js/document (getElementById "main"))}))
+
 (defn e-login [e]
-  (let [trader (find-selected-trader e)
-        ;; trader is index from g/traders
-        [logged-in? trader-name] (cond (= 0 trader) (geojit/login)
-                                       ;; (= 1 trader) (icici/login)
-                                       )]
-    (if logged-in?
-      (do (.log js/console "Congratulations! Logged in successfully, to trader: " trader-name)
-          )
+  (let [trader (find-selected-trader e)] ; trader is index from g/traders
+    (if (cond (= 0 trader) (geojit/login)
+              ;; (= 1 trader) (icici/login)
+              :else nil)
+      (v-data-init)
       (js/alert "Login failed! Please try again."))
 
-    ;; return "false" is deprecated
     (.preventDefault e)))
 
 (defn v-login [traders owner]
@@ -54,7 +81,6 @@
                (dom/div nil
                         (dom/label nil
                                    (dom/button #js {:className "btn btn-default"
-                                                    :type "submit"
                                                     :onClick e-login}
                                                "Submit")))))))
 
@@ -67,9 +93,7 @@
      (if-not (:logged-in? data)
        (reify om/IRender
          (render [_] (om/build v-login g/traders)))
-       ;; TODO
-       (reify om/IRender
-         (render [_] (dom/p nil "TODO")))))
+       (v-data-init)))
    g/app-state
    {:target (. js/document (getElementById "main"))}))
 
