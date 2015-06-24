@@ -3,6 +3,7 @@
               [om.dom :as dom :include-macros true]
 
               [bulk-trader.globals :as g]
+              [bulk-trader.parse :as p]
               [bulk-trader.geojit :as geojit]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -44,14 +45,57 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; event-handlers and views
 
+(defn v-clear-overlay []
+  (om/root
+   (fn [data owner]
+     (reify om/IRender
+       (render [_]
+         (dom/div nil))))
+   g/app-state
+   {:target (. js/document (getElementById "overlay"))}))
+
 (defn e-trade [e]
   (.log js/console "inside e-trade")
 
   (.preventDefault e))
 
-(defn e-edit-data [e]
-  (.log js/console "inside e-edit-data")
+;; pre-define
+(def v-init-data nil)
 
+(defn e-edit-data-save [e]
+  (let [data (.-value (.-firstChild (.-parentNode (.-parentNode (.-target e)))))]
+    (swap! g/app-state assoc :data (p/parse data)))
+
+  (v-init-data)
+  (v-clear-overlay)
+  (.preventDefault e))
+
+(defn e-edit-data-cancel [e]
+  (v-clear-overlay)
+  (.preventDefault e))
+
+(defn v-edit-data []
+  (om/root
+   (fn [data owner]
+     (reify om/IRender
+       (render [_]
+         (dom/div nil
+                  (dom/textarea #js {:rows 20
+                                     :cols 50
+                                     :readOnly false}
+                                (p/unparse (:data data)))
+                  (dom/div nil
+                           (dom/button #js {:className "btn btn-default"
+                                            :onClick e-edit-data-save}
+                                       "Save Changes")
+                           (dom/button #js {:className "btn btn-default"
+                                            :onClick e-edit-data-cancel}
+                                       "Cancel"))))))
+   g/app-state
+   {:target (. js/document (getElementById "overlay"))}))
+
+(defn e-edit-data [e]
+  (v-edit-data)
   (.preventDefault e))
 
 (defn e-upload-data [e]
@@ -64,7 +108,7 @@
 
   (.preventDefault e))
 
-(defn v-data-init []
+(defn v-init-data []
   (om/root
    (fn [data owner]
      (reify om/IRender
@@ -103,7 +147,7 @@
     (if (cond (= 0 trader) (geojit/login)
               ;; (= 1 trader) (icici/login)
               :else nil)
-      (v-data-init)
+      (v-init-data)
       (js/alert "Login failed! Please try again."))
 
     (.preventDefault e)))
@@ -130,7 +174,7 @@
      (if-not (:logged-in? data)
        (reify om/IRender
          (render [_] (om/build v-login g/traders)))
-       (v-data-init)))
+       (v-init-data)))
    g/app-state
    {:target (. js/document (getElementById "main"))}))
 

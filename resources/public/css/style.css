@@ -1,2 +1,9 @@
 /* some style */
-
+#overlay {
+    position: relative;
+    /*width: 500px;
+    height: 500px;
+    top: 100px;
+    left: 100px;
+    border: 1px solid black;*/
+}
