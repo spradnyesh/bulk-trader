@@ -103,11 +103,6 @@
 
   (.preventDefault e))
 
-(defn e-enter-data [e]
-  (.log js/console "inside e-enter-data")
-
-  (.preventDefault e))
-
 (defn v-init-data []
   (om/root
    (fn [data owner]
@@ -120,7 +115,7 @@
                     (dom/div nil
                              (dom/label nil
                                         (dom/button #js {:className "btn btn-default"
-                                                         :onClick e-enter-data}
+                                                         :onClick e-edit-data}
                                                     "Enter / Copy-Paste"))
                              (dom/label nil
                                         (dom/button #js {:className "btn btn-default"
