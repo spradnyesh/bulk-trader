@@ -123,17 +123,18 @@
                                        [:button {:className "btn btn-default"
                                                  :onClick e-upload-data}
                                         "Upload"]]]]
-                           [:div nil [:div nil [:label nil
-                                                [:button {:className "btn btn-default"
-                                                          :onClick e-edit-data}
-                                                 "Edit Trading Data"]
-                                                [:label nil
-                                                 [:button {:className "btn btn-default"
-                                                           :onClick e-trade}
-                                                  "Execute Trades!!!"]]]]
+                           [:div nil
+                            [:div nil [:label nil
+                                       [:button {:className "btn btn-default"
+                                                 :onClick e-edit-data}
+                                        "Edit Trading Data"]
+                                       [:label nil
+                                        [:button {:className "btn btn-default"
+                                                  :onClick e-trade}
+                                         "Execute Trades!!!"]]]]
                             [:h4 nil "Existing Trading Data:"]
                             [:table {:className "table table-striped table-bordered"}
-                             (map #(om/build c-data %) (:data data))]])]))))
+                             [:tbody (map #(om/build c-data %) (:data data))]]])]))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; roots
