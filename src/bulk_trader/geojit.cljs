@@ -17,5 +17,5 @@
         trader (if logged-in? trader-name nil)]
     (swap! g/app-state assoc
            :trader trader
-           :logged-in logged-in?)
+           :logged-in? logged-in?)
     logged-in?))
