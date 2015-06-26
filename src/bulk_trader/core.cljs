@@ -1,6 +1,7 @@
 (ns ^:figwheel-always bulk-trader.core
     (:require [om.core :as om :include-macros true]
               [om.dom :as dom :include-macros true]
+              [sablono.core :as html :refer-macros [html]]
 
               [bulk-trader.globals :as g]
               [bulk-trader.parse :as p]
@@ -19,39 +20,32 @@
         (let [checked (.-checked (aget (.-children (aget (.-children (aget children i)) 0)) 0))]
           (if checked i (recur (dec i))))))))
 
-(defn trader-view [trader owner]
-  (reify om/IRender
-    (render [this]
-      (dom/div "radio"
-               (dom/label "form-group"
-                          (dom/input #js {:type "radio" :name "optionRadios"
-                                          :value (:v trader)}
-                                     (:n trader)))))))
+(defn c-trader [trader owner]
+  (om/component (html [:div {:className "radio"}
+                       [:label {:className "form-group"}
+                        [:input {:type "radio" :name "optionRadios"
+                                 :value (:v trader)}
+                         (:n trader)]]])))
 
-(defn data-view [data owner]
-  (reify om/IRender
-    (render [this]
-      (let [[exch segment smbl bs qty typ price slprice] data]
-        (dom/tr nil
-                (dom/td nil exch)
-                (dom/td nil segment)
-                (dom/td nil smbl)
-                (dom/td nil bs)
-                (dom/td nil qty)
-                (dom/td nil typ)
-                (dom/td nil price)
-                (dom/td nil slprice))))))
+(defn c-data [data owner]
+  (let [[exch segment smbl bs qty typ price slprice] data]
+    (om/component (html [:tr nil
+                         [:td nil exch]
+                         [:td nil segment]
+                         [:td nil smbl]
+                         [:td nil bs]
+                         [:td nil qty]
+                         [:td nil typ]
+                         [:td nil price]
+                         [:td nil slprice]]))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; event-handlers and views
 
 (defn v-clear-overlay []
   (om/root
-   (fn [data owner]
-     (reify om/IRender
-       (render [_]
-         (dom/div nil))))
-   g/app-state
+   (fn [data owner] (om/component (html [:div nil])))
+   g/overlay-state
    {:target (. js/document (getElementById "overlay"))}))
 
 (defn e-trade [e]
@@ -59,14 +53,9 @@
 
   (.preventDefault e))
 
-;; pre-define
-(def v-init-data nil)
-
 (defn e-edit-data-save [e]
   (let [data (.-value (.-firstChild (.-parentNode (.-parentNode (.-target e)))))]
-    (swap! g/app-state assoc :data (p/parse data)))
-
-  (v-init-data)
+    (swap! g/app-state assoc :data (p/parse data))) ; will call v-init-data automatically
   (v-clear-overlay)
   (.preventDefault e))
 
@@ -74,23 +63,23 @@
   (v-clear-overlay)
   (.preventDefault e))
 
+(defn c-edit-data [data owner]
+  (om/component (html [:div nil
+                       [:textarea {:rows 20
+                                   :cols 50
+                                   :readOnly false
+                                   :defaultValue (p/unparse (:data data))}]
+                       [:div nil
+                        [:button {:className "btn btn-default"
+                                  :onClick e-edit-data-save}
+                         "Save Changes"]
+                        [:button {:className "btn btn-default"
+                                  :onClick e-edit-data-cancel}
+                         "Cancel"]]])))
+
 (defn v-edit-data []
   (om/root
-   (fn [data owner]
-     (reify om/IRender
-       (render [_]
-         (dom/div nil
-                  (dom/textarea #js {:rows 20
-                                     :cols 50
-                                     :readOnly false}
-                                (p/unparse (:data data)))
-                  (dom/div nil
-                           (dom/button #js {:className "btn btn-default"
-                                            :onClick e-edit-data-save}
-                                       "Save Changes")
-                           (dom/button #js {:className "btn btn-default"
-                                            :onClick e-edit-data-cancel}
-                                       "Cancel"))))))
+   c-edit-data
    g/app-state
    {:target (. js/document (getElementById "overlay"))}))
 
@@ -103,39 +92,38 @@
 
   (.preventDefault e))
 
+(defn c-init-data [data owner]
+  (om/component (html [:div nil
+                       [:h3 nil "Logged in to trader: "
+                        [:mark nil (:trader data)]]
+                       (if (nil? (:data data))
+                         [:div nil [:label nil
+                                    [:button {:className "btn btn-default"
+                                              :onClick e-edit-data}
+                                     "Enter / Copy-Paste"]
+                                    [:label nil
+                                     [:button {:className "btn btn-default"
+                                               :onClick e-upload-data}
+                                      "Upload"]]]]
+                         [:div nil [:div nil [:label nil
+                                              [:button {:className "btn btn-default"
+                                                        :onClick e-edit-data}
+                                               "Edit Trading Data"]
+                                              [:label nil
+                                               [:button {:className "btn btn-default"
+                                                         :onClick e-trade}
+                                                "Execute Trades!!!"]]]]
+                          [:h4 nil "Existing Trading Data:"]
+                          [:table {:className "table table-striped table-bordered"}
+                           (map #(om/build c-data %) (:data data))]])])))
+
 (defn v-init-data []
   (om/root
-   (fn [data owner]
-     (reify om/IRender
-       (render [_]
-         (dom/div nil
-                  (dom/h3 nil "Logged in to trader: "
-                          (dom/mark nil (:trader data)))
-                  (if (nil? (:data data))
-                    (dom/div nil
-                             (dom/label nil
-                                        (dom/button #js {:className "btn btn-default"
-                                                         :onClick e-edit-data}
-                                                    "Enter / Copy-Paste"))
-                             (dom/label nil
-                                        (dom/button #js {:className "btn btn-default"
-                                                         :onClick e-upload-data}
-                                                    "Upload")))
-                    (dom/div nil
-                             (dom/div nil
-                                      (dom/label nil
-                                                 (dom/button #js {:className "btn btn-default"
-                                                                  :onClick e-edit-data}
-                                                             "Edit Trading Data"))
-                                      (dom/label nil
-                                                 (dom/button #js {:className "btn btn-default"
-                                                                  :onClick e-trade}
-                                                             "Execute Trades!!!")))
-                             (dom/h4 nil "Existing Trading Data:")
-                             (apply dom/table #js {:className "table table-striped table-bordered"}
-                                    (om/build-all data-view (:data data)))))))))
+   c-init-data
    g/app-state
    {:target (. js/document (getElementById "main"))}))
+
+
 
 (defn e-login [e]
   (let [trader (find-selected-trader e)] ; trader is index from g/traders
@@ -147,18 +135,16 @@
 
     (.preventDefault e)))
 
-(defn v-login [traders owner]
-  (reify om/IRender
-    (render [this]
-      (dom/form #js {:action "#"}
-               (dom/h3 nil "Select Trader")
-               (apply dom/div #js {:className "radio"}
-                      (om/build-all trader-view traders))
-               (dom/div nil
-                        (dom/label nil
-                                   (dom/button #js {:className "btn btn-default"
-                                                    :onClick e-login}
-                                               "Submit")))))))
+(defn c-login [traders]
+  (om/component (html [:form nil
+                       [:h3 nil "Select Trader"]
+                       [:div {:className "radio"}
+                        (map #(om/build c-trader %) traders)]
+                       [:div nil
+                        [:label nil
+                         [:button {:className "btn btn-default"
+                                   :onClick e-login}
+                          "Submit"]]]])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; init
@@ -167,8 +153,7 @@
   (om/root
    (fn [data owner]
      (if-not (:logged-in? data)
-       (reify om/IRender
-         (render [_] (om/build v-login g/traders)))
+       (c-login g/traders)
        (v-init-data)))
    g/app-state
    {:target (. js/document (getElementById "main"))}))

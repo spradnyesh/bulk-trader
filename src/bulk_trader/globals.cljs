@@ -6,6 +6,7 @@
 (defonce app-state (atom {:trader nil
                           :logged-in? false
                           :data nil}))
+(defonce overlay-state (atom 0))
 
 (defonce traders [{:v "geojit" :n "Geojit BNP Paribas"}
                   {:v "icici" :n "ICICI Direct"}])
