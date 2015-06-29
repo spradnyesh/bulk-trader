@@ -17,8 +17,8 @@
     (loop [i (dec (.-length children))]
       (if (= -1 i)
         -1 ; none selected
-        (let [checked (.-checked (aget (.-children (aget (.-children (aget children i)) 0)) 0))]
-          (if checked i (recur (dec i))))))))
+        (if-let [checked (.-checked (aget (.-children (aget (.-children (aget children i)) 0)) 0))]
+          i (recur (dec i)))))))
 
 (defn c-trader [trader owner]
   (om/component (html [:div {:className "radio"}
@@ -39,7 +39,8 @@
                          [:td nil price]
                          [:td nil slprice]]))))
 
-(defn clear-overlay []
+(defn clear-overlay [e]
+  (.preventDefault e)
   (swap! g/overlay-state assoc
          :state false
          :data nil))
@@ -53,14 +54,12 @@
   (.log js/console "inside e-trade"))
 
 (defn e-edit-data-save [e]
-  (.preventDefault e)
   (let [data (.-value (.-firstChild (.-parentNode (.-parentNode (.-target e)))))]
     (swap! g/app-state assoc :data (p/parse data)))
-  (clear-overlay))
+  (clear-overlay e))
 
 (defn e-edit-data-cancel [e]
-  (.preventDefault e)
-  (clear-overlay))
+  (clear-overlay e))
 
 (defn c-overlay [data owner]
   (if (:state data)
@@ -139,7 +138,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; roots
 
-;; v-edit-data
 (om/root c-overlay
          g/overlay-state
          {:target (. js/document (getElementById "overlay"))})
