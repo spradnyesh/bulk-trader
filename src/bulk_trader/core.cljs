@@ -54,7 +54,7 @@
   (.log js/console "inside e-trade"))
 
 (defn e-edit-data-save [e]
-  (let [data (.-value (.-firstChild (.-parentNode (.-parentNode (.-target e)))))]
+  (let [data (.-value (.-firstChild (.-parentNode (.-parentNode (.-parentNode (.-target e))))))]
     (swap! g/app-state assoc :data (p/parse data)))
   (clear-overlay e))
 
@@ -114,14 +114,17 @@
                          [:h3 nil "Logged in to trader: "
                           [:mark nil (:trader data)]]
                          (if (empty? (:data data))
-                           [:div nil [:label nil
-                                      [:button {:className "btn btn-default"
-                                                :onClick e-edit-data}
-                                       "Enter / Copy-Paste"]
-                                      [:label nil
-                                       [:button {:className "btn btn-default"
-                                                 :onClick e-upload-data}
-                                        "Upload"]]]]
+                           [:div nil
+                            [:label nil
+                             [:button {:className "btn btn-default"
+                                       :onClick e-edit-data}
+                              "Enter / Copy-Paste"]]
+                            [:label nil
+                             [:input {:type "file"
+                                      :className "fileinput"}]
+                             [:button {:className "btn btn-default"
+                                       :onClick e-upload-data}
+                              "Upload"]]]
                            [:div nil
                             [:div nil [:label nil
                                        [:button {:className "btn btn-default"
