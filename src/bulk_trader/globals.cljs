@@ -9,5 +9,5 @@
 (defonce overlay-state (atom {:data nil
                               :state false}))
 
-(defonce traders [{:v "geojit" :n "Geojit BNP Paribas"}
-                  {:v "icici" :n "ICICI Direct"}])
+(defonce traders [{:i 0 :v "geojit" :n "Geojit BNP Paribas" :l "bulk_trader/geojit/login"}
+                  {:i 1 :v "icici" :n "ICICI Direct" :l "bulk_trader/icici/login"}])

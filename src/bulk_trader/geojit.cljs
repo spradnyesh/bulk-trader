@@ -12,7 +12,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn login []
+(defn ^:export login []
   (let [logged-in? (do-login)
         trader (if logged-in? trader-name nil)]
     (swap! g/app-state assoc

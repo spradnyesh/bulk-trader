@@ -5,7 +5,7 @@
 
               [bulk-trader.globals :as g]
               [bulk-trader.parse :as p]
-              [bulk-trader.geojit :as geojit]))
+              [bulk-trader.utils :as u]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; helpers
@@ -107,11 +107,8 @@
 
 (defn e-login [e]
   (.preventDefault e)
-
-  (let [trader (find-selected-trader e)] ; trader is index from g/traders
-    (when-not (cond (= 0 trader) (geojit/login)
-                    ;; (= 1 trader) (icici/login)
-                    :else nil)
+  (let [trader (first (filter #(= (find-selected-trader e) (:i %)) g/traders))]
+    (when-not (u/invoke (:l trader))
       (js/alert "Login failed! Please try again."))))
 
 (defn c-login [data owner]
