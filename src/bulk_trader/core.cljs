@@ -42,8 +42,30 @@
 (defn clear-overlay [e]
   (.preventDefault e)
   (swap! g/overlay-state assoc
-         :state false
-         :data nil))
+         :state false))
+
+(defn clear-error [e]
+  (.preventDefault e)
+  (swap! g/error-state assoc
+         :state false))
+
+(defn validation-errors-markup [data]
+  (html [:table {:className "table table-striped table-bordered"}
+         [:tbody
+          [:tr [:th "#Row"] [:th "Issue"]]
+          (map (fn [[r is]]
+                 (map (fn [i] [:tr [:td r] [:td i]]) is))
+               data)]]))
+
+(defn save-data [data e]
+  (let [parsed (p/parse data)]
+    (if (first parsed)
+      (do (clear-overlay e) ; close existing (in case of "upload another file") overlay
+          (swap! g/app-state assoc
+                 :data (second parsed)))
+      (swap! g/error-state assoc
+             :state true
+             :data (validation-errors-markup (second parsed))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; event-handlers and views
@@ -55,8 +77,7 @@
 
 (defn e-edit-data-save [e]
   (let [data (.-value (.-firstChild (.-parentNode (.-parentNode (.-parentNode (.-target e))))))]
-    (swap! g/app-state assoc :data (p/parse data)))
-  (clear-overlay e))
+    (save-data data e)))
 
 (defn e-edit-data-cancel [e]
   (clear-overlay e))
@@ -74,16 +95,23 @@
     ;; set "onload" event handler for reader
     (set! (.-onload reader)
           (fn [event]
-            ;; close existing (in case of "upload another file") overlay
-            (clear-overlay event)
-            (swap! g/app-state assoc
-                   :data (p/parse (.-result (.-target event))))))
+            (save-data (.-result (.-target event)) event)))
     ;; fire "read" event
     (.readAsText reader file)))
 
+(defn c-error [data owner]
+  (if (:state data)
+    (om/component (html [:div {:className "z-div"}
+                         [:div nil (:data data)]
+                         [:div nil [:label nil
+                                    [:button {:className "btn btn-default"
+                                              :onClick clear-error}
+                                     "Close"]]]]))
+    (om/component (html [:div {:className "z-div"}]))))
+
 (defn c-overlay [data owner]
   (if (:state data)
-    (om/component (html [:div nil
+    (om/component (html [:div {:className "z-div"}
                          [:textarea {:rows 20
                                      :cols 65
                                      :defaultValue (:data data)}]
@@ -103,7 +131,7 @@
                             [:button {:className "btn btn-default"
                                       :onClick e-upload-data}
                              "Upload Another File"]]]]))
-    (om/component (html [:div nil]))))
+    (om/component (html [:div {:className "z-div"}]))))
 
 (defn e-login [e]
   (.preventDefault e)
@@ -155,6 +183,10 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; roots
+
+(om/root c-error
+         g/error-state
+         {:target (. js/document (getElementById "error"))})
 
 (om/root c-overlay
          g/overlay-state

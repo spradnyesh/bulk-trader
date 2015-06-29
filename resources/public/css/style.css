@@ -10,18 +10,20 @@ main {
 textarea {
     margin-bottom: 10px;
 }
-#overlay div:first-child {
+.z-div {
     width: 580px;
     padding: 10px;
     position: absolute;
     left: 10px;
     top: 100px;
     background-color: #eee;
+    border: 1px solid black;
     border-radius: 7px;
 }
-#overlay div:empty {
+.z-div:empty {
     width: 0;
     padding: 0;
+    border: 0;
 }
 .fileinput {
     float: left;
