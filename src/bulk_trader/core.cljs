@@ -85,7 +85,7 @@
   (if (:state data)
     (om/component (html [:div nil
                          [:textarea {:rows 20
-                                     :cols 50
+                                     :cols 65
                                      :defaultValue (:data data)}]
                          [:div nil
                           [:label nil
@@ -95,13 +95,14 @@
                           [:label nil
                            [:button {:className "btn btn-default"
                                      :onClick e-edit-data-cancel}
-                            "Cancel"]]
-                          [:label nil
-                           [:input {:type "file"
-                                    :className "fileinput"}]
-                           [:button {:className "btn btn-default"
-                                     :onClick e-upload-data}
-                            "Upload Another File"]]]]))
+                            "Cancel"]]]
+                         [:div nil
+                           [:label nil
+                            [:input {:type "file"
+                                     :className "fileinput"}]
+                            [:button {:className "btn btn-default"
+                                      :onClick e-upload-data}
+                             "Upload Another File"]]]]))
     (om/component (html [:div nil]))))
 
 (defn e-login [e]

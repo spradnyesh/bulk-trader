@@ -1,11 +1,27 @@
-/* some style */
-#overlay {
-    position: relative;
-    /*width: 500px;
-    height: 500px;
+body {
+    width: 600px;
+    margin: 0 auto;
+    position: relative; // needed for overlay
+}
+main {
+    min-height: 600px;
+    padding: 50px 0;
+}
+textarea {
+    margin-bottom: 10px;
+}
+#overlay div:first-child {
+    width: 580px;
+    padding: 10px;
+    position: absolute;
+    left: 10px;
     top: 100px;
-    left: 100px;
-    border: 1px solid black;*/
+    background-color: #eee;
+    border-radius: 7px;
+}
+#overlay div:empty {
+    width: 0;
+    padding: 0;
 }
 .fileinput {
     float: left;
