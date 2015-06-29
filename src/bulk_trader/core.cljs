@@ -61,21 +61,6 @@
 (defn e-edit-data-cancel [e]
   (clear-overlay e))
 
-(defn c-overlay [data owner]
-  (if (:state data)
-    (om/component (html [:div nil
-                         [:textarea {:rows 20
-                                     :cols 50
-                                     :defaultValue (:data data)}]
-                         [:div nil
-                          [:button {:className "btn btn-default"
-                                    :onClick e-edit-data-save}
-                           "Save Changes"]
-                          [:button {:className "btn btn-default"
-                                    :onClick e-edit-data-cancel}
-                           "Cancel"]]]))
-    (om/component (html [:div nil]))))
-
 (defn e-edit-data [e]
   (.preventDefault e)
   (swap! g/overlay-state assoc
@@ -84,8 +69,40 @@
 
 (defn e-upload-data [e]
   (.preventDefault e)
+  (let [file (aget (.-files (.-firstChild (.-parentNode (.-target e)))) 0)
+        reader (js/FileReader.)]
+    ;; set "onload" event handler for reader
+    (set! (.-onload reader)
+          (fn [event]
+            ;; close existing (in case of "upload another file") overlay
+            (clear-overlay event)
+            (swap! g/app-state assoc
+                   :data (p/parse (.-result (.-target event))))))
+    ;; fire "read" event
+    (.readAsText reader file)))
 
-  (.log js/console "inside e-upload-data"))
+(defn c-overlay [data owner]
+  (if (:state data)
+    (om/component (html [:div nil
+                         [:textarea {:rows 20
+                                     :cols 50
+                                     :defaultValue (:data data)}]
+                         [:div nil
+                          [:label nil
+                           [:button {:className "btn btn-default"
+                                     :onClick e-edit-data-save}
+                            "Save Changes"]]
+                          [:label nil
+                           [:button {:className "btn btn-default"
+                                     :onClick e-edit-data-cancel}
+                            "Cancel"]]
+                          [:label nil
+                           [:input {:type "file"
+                                    :className "fileinput"}]
+                           [:button {:className "btn btn-default"
+                                     :onClick e-upload-data}
+                            "Upload Another File"]]]]))
+    (om/component (html [:div nil]))))
 
 (defn e-login [e]
   (.preventDefault e)
