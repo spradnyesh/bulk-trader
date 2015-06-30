@@ -142,8 +142,7 @@
 (defn c-login [data owner]
   (om/component (html [:form nil
                        [:h3 nil "Select Trader"]
-                       [:div nil
-                        (map #(om/build c-trader %) data)]
+                       [:div nil (map #(om/build c-trader %) data)]
                        [:div nil
                         [:label nil
                          [:button {:className "btn btn-default"
@@ -193,15 +192,6 @@
          {:target (. js/document (getElementById "overlay"))})
 
 ;; init "root" is inside defn, coz need to call it below and on-js-reload
-(defn init []
-  (om/root c-app
-           g/app-state
-           {:target (. js/document (getElementById "main"))}))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; init
-
-(defn on-js-reload []
-  (init))
-
-(init)
+(om/root c-app
+         g/app-state
+         {:target (. js/document (getElementById "main"))})
