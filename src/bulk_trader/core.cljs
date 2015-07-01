@@ -12,7 +12,7 @@
 
 ;; find "index" (from g/traders) of selected trader
 (defn find-selected-trader [e]
-  (let [children (.-children (aget (.-children (.-form (.-target e))) 1))]
+  (let [children (.-children (aget (.. e -target -form -children) 1))]
     ;; this "loop" is needed coz children is HTMLElements which is *not* iterable
     (loop [i (dec (.-length children))]
       (if (= -1 i)
@@ -76,7 +76,7 @@
   (.log js/console "inside e-trade"))
 
 (defn e-edit-data-save [e]
-  (let [data (.-value (.-firstChild (.-parentNode (.-parentNode (.-parentNode (.-target e))))))]
+  (let [data (.. e -target -parentNode -parentNode -parentNode -firstChild -value)]
     (save-data data e)))
 
 (defn e-edit-data-cancel [e]
@@ -90,12 +90,12 @@
 
 (defn e-upload-data [e]
   (.preventDefault e)
-  (let [file (aget (.-files (.-firstChild (.-parentNode (.-target e)))) 0)
+  (let [file (aget (.. e -target -parentNode -firstChild -files) 0)
         reader (js/FileReader.)]
     ;; set "onload" event handler for reader
     (set! (.-onload reader)
           (fn [event]
-            (save-data (.-result (.-target event)) event)))
+            (save-data (.. event -target -result) event)))
     ;; fire "read" event
     (.readAsText reader file)))
 
@@ -191,7 +191,6 @@
          g/overlay-state
          {:target (. js/document (getElementById "overlay"))})
 
-;; init "root" is inside defn, coz need to call it below and on-js-reload
 (om/root c-app
          g/app-state
          {:target (. js/document (getElementById "main"))})
