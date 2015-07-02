@@ -1,7 +1,8 @@
 (ns ^:figwheel-always bulk-trader.core
+    (:require-macros [cljs.core.async.macros :refer [go]])
     (:require [om.core :as om :include-macros true]
-              [om.dom :as dom :include-macros true]
               [sablono.core :as html :refer-macros [html]]
+              [cljs.core.async :refer [put! chan <!]]
 
               [bulk-trader.globals :as g]
               [bulk-trader.parse :as p]
@@ -92,10 +93,11 @@
   (.preventDefault e)
   (let [file (aget (.. e -target -parentNode -firstChild -files) 0)
         reader (js/FileReader.)]
-    ;; set "onload" event handler for reader
-    (set! (.-onload reader)
-          (fn [event]
-            (save-data (.. event -target -result) event)))
+    (if (or (= "text/csv" (.-type file)) (= "application/ms-excel" (.-type file)))
+      (set! (.-onload reader) ; set "onload" event handler for reader
+            (fn [event]
+              (save-data (.. event -target -result) event)))
+      (js/alert "Please upload a .csv file"))
     ;; fire "read" event
     (.readAsText reader file)))
 
