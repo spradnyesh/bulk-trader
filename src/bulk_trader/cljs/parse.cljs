@@ -1,7 +1,7 @@
-(ns ^:figwheel-always bulk-trader.parse
+(ns ^:figwheel-always bulk-trader.cljs.parse
     (:require [clojure.string :as str]
 
-              [bulk-trader.globals :as g]))
+              [bulk-trader.cljs.globals :as g]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; validation helpers

@@ -1,4 +1,4 @@
-(ns ^:figwheel-always bulk-trader.globals)
+(ns ^:figwheel-always bulk-trader.cljs.globals)
 
 (enable-console-print!)
 
@@ -10,13 +10,23 @@
                               :state false}))
 (defonce error-state (atom {:data nil
                             :state false}))
+(defonce login-state (atom {:state false
+                            :trader nil
+                            ;; Geojit
+                            :usercode nil
+                            :pass nil
+                            :sessionkey nil}))
 
-(def validateur {:exch {:nse {:segments ["EQ"]}
+(defonce validateur {:exch {:nse {:segments ["EQ"]}
                         :bse {:segments ["EQ"]}}
                  :bs ["B" "S"]
                  :typ ["M" "L" "S"]
                  :p-token 0.05})
 
-(defonce traders [{:i 0 :v "geojit" :n "Geojit BNP Paribas" :l "bulk_trader/geojit/login"
+(defonce traders [{:i 0 :v "geojit" :n "Geojit BNP Paribas"
+                   :login-fn "bulk_trader/cljs/geojit/login"
+                   :login-url "/login"
                    :vr validateur}
-                  {:i 1 :v "icici" :n "ICICI Direct" :l "bulk_trader/icici/login"}])
+                  {:i 1 :v "icici" :n "ICICI Direct"
+                   :login-fl "bulk_trader/cljs/icici/login"}])
+(defonce login-url "/login")

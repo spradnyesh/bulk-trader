@@ -14,13 +14,16 @@
                  [hiccup "1.0.5"]
                  [lib-noir "0.8.4"]
                  [noir-exception "0.2.2"]
+                 [com.cognitect/transit-cljs "0.8.220"]
+                 [ring-transit "0.1.3"]
                  [com.taoensso/timbre "3.4.0"]
 
                  ;; frontend
                  [org.clojure/clojurescript "0.0-3211"]
-                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [sablono "0.3.4"]
-                 [org.omcljs/om "0.8.8"]]
+                 [org.omcljs/om "0.8.8"]
+                 [cljs-ajax "0.3.13"]
+                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]]
 
   :plugins [[cider/cider-nrepl "0.9.1-SNAPSHOT" :exclusions [org.clojure/tools.nrepl]]
             ;; backend

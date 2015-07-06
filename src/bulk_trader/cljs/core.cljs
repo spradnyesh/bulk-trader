@@ -1,12 +1,12 @@
-(ns ^:figwheel-always bulk-trader.core
+(ns ^:figwheel-always bulk-trader.cljs.core
     (:require-macros [cljs.core.async.macros :refer [go]])
     (:require [om.core :as om :include-macros true]
               [sablono.core :as html :refer-macros [html]]
               [cljs.core.async :refer [put! chan <!]]
 
-              [bulk-trader.globals :as g]
-              [bulk-trader.parse :as p]
-              [bulk-trader.utils :as u]))
+              [bulk-trader.cljs.globals :as g]
+              [bulk-trader.cljs.parse :as p]
+              [bulk-trader.cljs.utils :as u]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; helpers
@@ -135,13 +135,19 @@
                              "Upload Another File"]]]]))
     (om/component (html [:div {:className "z-div"}]))))
 
+(defn c-login [data owner]
+  (if-let [trader (:trader data)]
+    (u/invoke (:login-fn trader) data owner)
+    (om/component (html [:div nil]))))
+
 (defn e-login [e]
   (.preventDefault e)
   (let [trader (first (filter #(= (find-selected-trader e) (:i %)) g/traders))]
-    (when-not (u/invoke (:l trader))
-      (js/alert "Login failed! Please try again."))))
+    (swap! g/login-state assoc
+           :state :login
+           :trader trader)))
 
-(defn c-login [data owner]
+(defn c-traders [data owner]
   (om/component (html [:form nil
                        [:h3 nil "Select Trader"]
                        [:div nil (map #(om/build c-trader %) data)]
@@ -153,7 +159,7 @@
 
 (defn c-app [data owner]
   (if-not (:logged-in? data)
-    (c-login g/traders owner)
+    (c-traders g/traders owner)
     (om/component (html [:div nil
                          [:h3 nil "Logged in to trader: "
                           [:mark nil (:trader data)]]
@@ -193,6 +199,12 @@
          g/overlay-state
          {:target (. js/document (getElementById "overlay"))})
 
+(om/root c-login
+         g/login-state
+         {:target (. js/document (getElementById "login"))})
+
 (om/root c-app
          g/app-state
          {:target (. js/document (getElementById "main"))})
+
+(defn on-js-reload [])

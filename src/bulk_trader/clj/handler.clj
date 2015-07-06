@@ -12,9 +12,8 @@
   (route/resources "/")
   (route/not-found "")) ; todo
 
-(def app (app-handler
-          [bt-routes app-routes]
-          :middleware (load-middleware)
-          :session-options {:timeout (* 60 30)
-                            :timeout-response (redirect "/")}
-          :formats [:json-kw :edn]))
+(def app (app-handler [bt-routes app-routes]
+                      :middleware (load-middleware)
+                      :session-options {:timeout (* 60 30)
+                                        :timeout-response (redirect "/")}
+                      :formats [:json-kw :edn]))

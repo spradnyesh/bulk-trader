@@ -1,6 +1,7 @@
 (ns bulk-trader.clj.middleware
   (:require [taoensso.timbre :as timbre]
             [environ.core :refer [env]]
+            [ring.middleware.transit :refer [wrap-transit-response]]
             [noir-exception.core
               :refer [wrap-internal-error wrap-exceptions]]))
 
@@ -11,6 +12,7 @@
 
 (def development-middleware
   [log-request
+   wrap-transit-response
    wrap-exceptions])
 
 (def production-middleware

@@ -1,7 +1,7 @@
-(ns ^:figwheel-always bulk-trader.utils
+(ns ^:figwheel-always bulk-trader.cljs.utils
     (:require [clojure.string :as str]
 
-              [bulk-trader.geojit :as geojit]))
+              [bulk-trader.cljs.geojit :as geojit]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; http://stackoverflow.com/a/30892955/4329629
