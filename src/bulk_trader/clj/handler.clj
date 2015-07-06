@@ -10,7 +10,7 @@
 (defroutes
   app-routes
   (route/resources "/")
-  (route/not-found "")) ; todo
+  (route/not-found "<h1>Page not found</h1>")) ; todo
 
 (def app (app-handler [bt-routes app-routes]
                       :middleware (load-middleware)

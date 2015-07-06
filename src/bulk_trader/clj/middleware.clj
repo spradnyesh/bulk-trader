@@ -12,11 +12,11 @@
 
 (def development-middleware
   [log-request
-   wrap-transit-response
    wrap-exceptions])
 
 (def production-middleware
-  [#(wrap-internal-error % :log (fn [e] (timbre/error e)))])
+  [#(wrap-internal-error % :log (fn [e] (timbre/error e)))
+   wrap-transit-response])
 
 (defn load-middleware []
   (concat (when (env :dev) development-middleware)

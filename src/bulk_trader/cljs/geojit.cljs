@@ -6,13 +6,21 @@
               [bulk-trader.cljs.globals :as g]
               [bulk-trader.cljs.traders-common :as tc]))
 
+(defonce trader "geojit")
 (defonce trader-name "Geojit BNP Paribas")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ajax handlers
 
 (defn handler [response]
-  (println (str response)))
+  ;; (println (str response))
+  (if-let [logged-in? (:logged-in? response)]
+    (do (tc/clear-login nil)
+        (swap! g/app-state assoc
+               :trader trader
+               :trader-name trader-name
+               :logged-in? logged-in?))
+    (js/alert (str "Login Failed! Error is:\n\n" (:error response) "\n\nPlease try again..."))))
 
 (defn error-handler [{:keys [status status-text]}]
   (println (str "something bad happened: " status ", " status-text)))
@@ -22,10 +30,13 @@
 
 (defn do-login [e]
   (.preventDefault e)
-  (GET "http://localhost:3000/login"
-       {:params {:foo "foo"}
-        :handler handler
-        :error-handler error-handler}))
+  (POST (str g/login-domain g/login-url)
+        {:params {:trader "geojit"
+                  :username "foo"
+                  :passwd "bar"
+                  :pan "baz"}
+         :handler handler
+         :error-handler error-handler}))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; components
@@ -71,10 +82,3 @@
   (if (:state data)
     (c-login data owner)
     (om/component (html [:div nil]))))
-
-;; (let [logged-in? (do-login data owner)
-;;         trader (if logged-in? trader-name nil)]
-;;     (swap! g/app-state assoc
-;;            :trader trader
-;;            :logged-in? logged-in?)
-;;     logged-in?)

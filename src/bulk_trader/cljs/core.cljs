@@ -162,7 +162,7 @@
     (c-traders g/traders owner)
     (om/component (html [:div nil
                          [:h3 nil "Logged in to trader: "
-                          [:mark nil (:trader data)]]
+                          [:mark nil (:trader-name data)]]
                          (if (empty? (:data data))
                            [:div nil
                             [:label nil

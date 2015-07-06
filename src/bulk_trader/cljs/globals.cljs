@@ -29,4 +29,5 @@
                    :vr validateur}
                   {:i 1 :v "icici" :n "ICICI Direct"
                    :login-fl "bulk_trader/cljs/icici/login"}])
+(def login-domain "http://localhost:3000") ; be-stox.gryff.in
 (defonce login-url "/login")
