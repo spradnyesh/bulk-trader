@@ -8,9 +8,12 @@
                  [org.clojure/tools.nrepl "0.2.10"]
 
                  ;; backend
+                 [environ "1.0.0"]
                  [http-kit "2.1.18"]
                  [clj-time "0.9.0"]
                  [hiccup "1.0.5"]
+                 [lib-noir "0.8.4"]
+                 [noir-exception "0.2.2"]
                  [com.taoensso/timbre "3.4.0"]
 
                  ;; frontend
@@ -20,18 +23,19 @@
                  [org.omcljs/om "0.8.8"]]
 
   :plugins [[cider/cider-nrepl "0.9.1-SNAPSHOT" :exclusions [org.clojure/tools.nrepl]]
+            ;; backend
+            [lein-environ "1.0.0"]
+            ;; frontend
             [lein-cljsbuild "1.0.5"]
             [lein-figwheel "0.3.3"]]
 
   :source-paths ["src"]
-
+  :main bulk-trader.clj.core
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
 
   :cljsbuild {:builds [{:id "dev"
                         :source-paths ["src/bulk_trader/cljs"]
-
                         :figwheel { :on-jsload "bulk-trader.cljs.core/on-js-reload" }
-
                         :compiler {:main bulk-trader.cljs.core
                                    :asset-path "js/compiled/out"
                                    :output-to "resources/public/js/compiled/bulk_trader.js"
