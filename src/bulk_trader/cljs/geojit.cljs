@@ -19,6 +19,7 @@
         (swap! g/app-state assoc
                :trader trader
                :trader-name trader-name
+               :sessionid (:sessionid response)
                :logged-in? logged-in?))
     (js/alert (str "Login Failed! Error is:\n\n" (:error response) "\n\nPlease try again..."))))
 
