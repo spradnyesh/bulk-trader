@@ -187,7 +187,8 @@
                                          "Execute Trades!!!"]]]]
                             [:h4 nil "Existing Trading Data:"]
                             [:table {:className "table table-striped table-bordered"}
-                             [:tbody (map #(om/build c-data % {:react-key (nth data 2)})
+                             [:tbody (map #(om/build c-data %
+                                                     {:react-key (str (nth % 2) "-" (nth % 3))})
                                           (:data data))]]])]))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
