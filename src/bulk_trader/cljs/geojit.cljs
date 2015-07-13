@@ -31,6 +31,7 @@
 
 (defn do-login [e]
   (.preventDefault e)
+  ;; (handler {:logged-in? true}) ; for testing "POST"
   (POST (str g/login-domain g/login-url)
         {:params {:trader "geojit"
                   :username "foo"
