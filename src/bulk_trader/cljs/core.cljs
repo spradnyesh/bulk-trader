@@ -150,7 +150,8 @@
 (defn c-traders [data owner]
   (om/component (html [:form nil
                        [:h3 nil "Select Trader"]
-                       [:div nil (map #(om/build c-trader %) data)]
+                       [:div nil (map #(om/build c-trader % {:react-key %})
+                                      data)]
                        [:div nil
                         [:label nil
                          [:button {:className "btn btn-default"
@@ -186,7 +187,8 @@
                                          "Execute Trades!!!"]]]]
                             [:h4 nil "Existing Trading Data:"]
                             [:table {:className "table table-striped table-bordered"}
-                             [:tbody (map #(om/build c-data %) (:data data))]]])]))))
+                             [:tbody (map #(om/build c-data % {:react-key (nth data 2)})
+                                          (:data data))]]])]))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; roots
